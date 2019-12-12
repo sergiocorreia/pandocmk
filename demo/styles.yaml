@@ -1,0 +1,43 @@
+# Reference:
+# https://yaml.org/spec/1.2/spec.html#id2760395
+# Nodes are defined by an anchor "&" after the colon ("foo: &foofoo")
+# Nodes are aliased through an asterisk "*"
+
+###############################################################
+#                        Default style
+###############################################################
+
+default: &default
+  geometry: margin=2.5cm
+  header-includes: &default-header-includes
+    - \newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}
+    - \usepackage{tabularx}
+
+###############################################################
+#                   Math latex definitions
+###############################################################
+
+math-header-includes: &math-header-includes
+  - \usepackage{dsfont}
+  - \usepackage{bbm}
+  - \newcommand{\1}[1]{\mathbbm{1}_{#1}}
+  - \newcommand*{\QED}{\hfill\ensuremath{\blacksquare}\medskip{}}
+
+###############################################################
+#                       General Styles
+###############################################################
+
+todo:
+  <<: *default
+  geometry: margin=3cm
+  header-includes:
+    - *default-header-includes
+    - \usepackage{setspace}
+referee-report:
+  geometry: margin=3cm
+  mainfont: 'Times New Roman'
+notes:
+  geometry: margin=2.5cm
+  header-includes:
+    - *math-header-includes
+    - \usepackage{setspace}
