@@ -63,3 +63,11 @@ After cloning the repo and opening the pandocmk folder:
 `python setup.py install`: install the package locally
 
 `python setup.py develop`: install locally with a symlink so changes are automatically updated
+
+
+# Roadmap
+
+- `v0.1`: use the `pandoc` metadata to build the CLI arguments
+- `v0.2`: add support for the `--view` and `--watch` options
+- `v0.3`: tweaks based on what we learned so far
+- `v0.4`: add support for styles (should we name them output, defaults, etc.?)

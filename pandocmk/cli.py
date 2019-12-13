@@ -9,41 +9,35 @@ Code for interfacing with the user through the CLI
 
 from pathlib import Path
 import click
-import panflute
 
-from .utils import get_metadata, dict2args
+from .version import __version__
+from .metadata import get_pandoc_options
+from .core import build_output
+from .watch import monitor_file
 
 
 # ---------------------------
 # Functions
 # ---------------------------
 
-help_str = """
+help_str = r"""
 Pandocmk: A minimalistic make for pandoc
 ========================================
 
-pandocmk [OPTIONS] [FILES]
-  --view			open output file in a viewer such as SumatraPDF for .pdf
-  --watch			monitor the input files for changes, and rebuild as needed
-  --tex				save .tex output besides .pdf
-  --timeit			show build time
-  --verbose			show debugging information
-
-  --draft			NOT IMPLEMENTED.
-                    When building a Latex PDF, choose faster options (pdflatex, etc)
-
-Note: other options are passed to Pandoc
+pandocmk [OPTIONS] [PANDOC OPTIONS] [FILES]
 """
 
-@click.command(help=help_str)
+@click.command(help=help_str, context_settings=dict(ignore_unknown_options=True) )
+@click.version_option(version=__version__)
 @click.argument('file', type=click.Path(exists=True))
-@click.option('--view', is_flag=True, default=False, help="TBD")
-@click.option('--watch', '-w', is_flag=True, default=False, help="TBD")
-@click.option('--timeit', '--time', is_flag=True, default=False, help="TBD")
-@click.option('--draft', is_flag=True, default=False, help="Use faster pdflatex and other speedups; not implemented yet")
-@click.option('--tex', is_flag=True, default=False, help="Save .tex output")
-@click.option('--verbose', '-v', is_flag=True, default=False, help="TBD")
+@click.option('--view', is_flag=True, default=False, help="open output file in a viewer such as SumatraPDF for .pdf")
+@click.option('--watch', '-w', is_flag=True, default=False, help="monitor the input files for changes, and rebuild as needed")
+@click.option('--timeit', '--time', is_flag=True, default=False, help="show build time")
+@click.option('--draft', is_flag=True, default=False, help="NOT IMPLEMENTED. When building a Latex PDF, choose faster options (pdflatex, etc)")
+@click.option('--tex', is_flag=True, default=False, help="save .tex output besides .pdf")
+@click.option('--verbose', '-v', is_flag=True, default=False, help="show debugging information")
 @click.argument('pandoc_args', nargs=-1, type=click.UNPROCESSED)
+
 
 def main(file, view, watch, timeit, draft, tex, verbose, pandoc_args):
 
@@ -51,76 +45,16 @@ def main(file, view, watch, timeit, draft, tex, verbose, pandoc_args):
     assert md_fn.suffix == '.md'
     assert md_fn.is_file()
 
+    # Get Pandoc options from CLI and YAML
+    pandoc_options = get_pandoc_options(pandoc_args, md_fn, verbose)
+
     # Always run early on
-    inner(md_fn, view=view, timeit=timeit, tex=tex, verbose=verbose, pandoc_args=pandoc_args)
+    build_output(md_fn, view=view, timeit=timeit, tex=tex, verbose=verbose, pandoc_options=pandoc_options)
 
     # Run on-demand if required
     if watch:
-        path = '.'
-        print(f'Monitoring file "{md_fn}" in directory {path}')
-        # view=False as we don't need Sublime to steal windows focus every time we save
-        event_handler = MarkdownUpdateHandler(md_fn, False, timeit, verbose, pandoc_args)
-        monitor_file(path, event_handler)
-
-
-def inner(md_fn, view, timeit, tex, verbose, pandoc_args):
-    #print('PASSTHROUGH OPTIONS:', pandoc_args)
-
-    # Get style
-    metadata_fn = None
-
-    ## metadata = get_metadata(md_fn)
-    ## style = metadata['style']
-    ## if verbose:
-    ##     print(f'- Style:        {style}')
-    ## if style not in styles:
-    ##     print(f'WARNING: Unknown style {style}; valid styles are {list(styles.keys())}; using "article" as default')
-    ## style_options = styles.get(style, 'notes')
-    ## #options = {**styles[style]} # Copy dict
-    ## if verbose:
-    ##     print('- Settings:')
-    ##     for k, v in style_options.items():
-    ##         print(f'      {k}: {v}')
-
-    ## # Write style
-    ## metadata_fn = write_metadata(md_fn, style_options)
-
-    # Call Tex
-    if tex:
-        pdf_fn = md_fn.parent / (md_fn.stem + '.tex')
-        pandoc_options = {'from': 'markdown', 'to': 'latex', 'standalone': True,
-            'pdf-engine': 'xelatex',
-            'output': pdf_fn}
-        if metadata_fn:
-        	pandoc_options['metadata-file'] = metadata_fn
-        	            
-        pandoc_args = dict2args(pandoc_options, md_fn)
-        panflute.run_pandoc(args=pandoc_args)
-        if verbose:
-            print('- Pandoc call:')
-            print(f'      pandoc {" ".join(pandoc_args)} {md_fn}')
-        assert False
-
-
-    # Call Pandoc
-    pdf_fn = md_fn.parent / (md_fn.stem + '.pdf')
-    pandoc_options = {'from': 'markdown', 'to': 'latex', 'standalone': True,
-        'pdf-engine': 'xelatex',
-        'output': pdf_fn}
-    if metadata_fn:
-    	pandoc_options['metadata-file'] = metadata_fn
-    
-    pandoc_args = dict2args(pandoc_options, md_fn)
-    if verbose:
-        print('- Pandoc call:')
-        print(f'      pandoc {" ".join(pandoc_args)}')
-    panflute.run_pandoc(args=pandoc_args)
-
-    # Call Sumatra
-    if view:
-        run_viewer(pdf_fn)
-
-    print('- Update complete')
+        monitor_file(md_fn, timeit=timeit, tex=tex, verbose=verbose, pandoc_options=pandoc_options)        
+        monitor_file(path, md_fn, timeit, verbose, pandoc_args)
 
 
 if __name__ == '__main__':

@@ -13,17 +13,18 @@ from pathlib import Path
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
+from .core import build_output
+
 
 class MarkdownUpdateHandler(FileSystemEventHandler):
 
-    def __init__(self, fn, view, timeit, tex, verbose, pandoc_args):
+    def __init__(self, fn, timeit, tex, verbose, pandoc_options):
         self.fn = fn
         self.fn = fn
-        self.view = view
         self.timeit = timeit
         self.tex = tex
         self.verbose = verbose
-        self.pandoc_args = pandoc_args
+        self.pandoc_options = pandoc_options
         self.last_update =  datetime.datetime(1,1,1) # Pick any old datetime
 
     def on_moved(self, event):
@@ -57,8 +58,9 @@ class MarkdownUpdateHandler(FileSystemEventHandler):
             print(delta)
 
         print(f' - File "{self.fn}" modified ({t.strftime("%I:%M:%S %p")})')
+        # view=False as we don't need SumatraPDF to steal windows focus every time we save
         #self.last_update = t
-        inner(self.fn, view=self.view, timeit=self.timeit, tex=self.tex, verbose=self.verbose, pandoc_args=self.pandoc_args)
+        build_output(self.fn, view=False, timeit=self.timeit, tex=self.tex, verbose=self.verbose, pandoc_options=self.pandoc_options)
         self.last_update = datetime.datetime.now()
         #print(event.src_path, event.key, event.event_type)
 
@@ -67,8 +69,13 @@ class MarkdownUpdateHandler(FileSystemEventHandler):
 # Functions
 # ---------------------------
 
-def monitor_file(path, event_handler):
-    
+def monitor_file(md_fn, timeit, tex, verbose, pandoc_options):
+
+    path = '.'
+    print(f'Monitoring file "{md_fn}" in directory {path}')
+
+    event_handler = MarkdownUpdateHandler(fn=md_fn, timeit=timeit, tex=tex, verbose=verbose, pandoc_options=pandoc_options)
+
     observer = Observer(timeout=1)
     observer.schedule(event_handler, path, recursive=False)
     observer.start()

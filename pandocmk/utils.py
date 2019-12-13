@@ -28,9 +28,3 @@ def get_metadata(fn):
     
     style = doc.get_metadata('style')
     return {'style': style}
-
-
-def dict2args(d, fn):
-    ans = [f'--{k}' if isinstance(v, bool) else f'--{k}={v}' for k, v in d.items()]
-    ans.append(str(fn))
-    return ans
