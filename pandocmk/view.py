@@ -14,7 +14,8 @@ import subprocess # import Popen, PIPE
 # Functions
 # ---------------------------
 
-def run_viewer(pdf_fn):
+def run_viewer(pdf_fn, verbose=False):
     cmd = ['SumatraPDF.exe', str(pdf_fn), '-reuse-instance']
-    #nice_print("CMD", cmd)
+    if verbose:
+    	print("[CMD]", ' '.join(cmd))
     subprocess.Popen(cmd)

@@ -54,7 +54,7 @@ def build_output(md_fn, view, timeit, tex, verbose, pandoc_options):
 
     # View PDF in SumatraPDF
     if view:
-        run_viewer(out_fn)
+        run_viewer(out_fn, verbose)
 
     if verbose:
         print(f'- File {out_fn} built!')
