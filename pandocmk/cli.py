@@ -24,7 +24,9 @@ help_str = r"""
 Pandocmk: A minimalistic make for pandoc
 ========================================
 
-pandocmk [OPTIONS] [PANDOC OPTIONS] [FILES]
+Note: [FILE] must come first; and options must be --key=val or --key
+
+pandocmk [FILES] [OPTIONS] [PANDOC OPTIONS]
 """
 
 @click.command(help=help_str, context_settings=dict(ignore_unknown_options=True) )
