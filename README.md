@@ -1,12 +1,12 @@
 # `pandocmk`: a minmalist make tool for Pandoc
 
-Writers of complex Pandoc documents often run into three issues:
+Authors of complex Pandoc documents often run into three issues:
 
 1. Very long command-line options that they need to remember (or copy-paste) all the time
 2. Need for extensibility, which can be mostly solved via filters (at the cost of #1)
 3. Pre/post processing tools, which *can* be solved via more complex one-liners (`pandoc ... && SumatraPDF output.pdf && ...`)
 
-The goal of `pandocmk` is to simplify using Pandoc, by helping with #1 and a little bit with #3 (#2 is covered by e.g. `panflute`). It uses information from the YAML metadata field to build the command-line arguments, and also has extra arguments for extras I find useful (such as monitoring a file and auto-building as needed, auto-viewing in a PDF viewer, etc.).
+The goal of `pandocmk` is to simplify using Pandoc, by helping with #1 and a bit of #3 (#2 is covered by e.g. `panflute`). It uses information from the YAML metadata field to build the command-line arguments, and also has extra arguments for extras I find useful (such as monitoring a file and auto-building as needed, auto-viewing in a PDF viewer, etc.).
 
 
 ## Existing tools
@@ -32,9 +32,6 @@ pandocmk [OPTIONS] [FILES]
   --tex				save .tex output besides .pdf
   --timeit			show build time
   --verbose			show debugging information
-
-  --draft			NOT IMPLEMENTED.
-                    When building a Latex PDF, choose faster options (pdflatex, etc)
 
 Note: other options are passed to Pandoc
 ```
