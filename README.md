@@ -65,6 +65,16 @@ After cloning the repo and opening the pandocmk folder:
 `python setup.py develop`: install locally with a symlink so changes are automatically updated
 
 
+## Dev Update PyPI:
+
+```
+python setup.py sdist bdist_wheel
+python -m twine upload dist/*
+```
+
+(Ensure README.md has unix line endings)
+
+
 # Roadmap
 
 - [X] `v0.1`: use the `pandoc` metadata to build the CLI arguments
