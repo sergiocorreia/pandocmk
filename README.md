@@ -67,7 +67,7 @@ After cloning the repo and opening the pandocmk folder:
 
 # Roadmap
 
-- `v0.1`: use the `pandoc` metadata to build the CLI arguments
-- `v0.2`: add support for the `--view` and `--watch` options
-- `v0.3`: tweaks based on what we learned so far
-- `v0.4`: add support for styles (should we name them output, defaults, etc.?)
+- [X] `v0.1`: use the `pandoc` metadata to build the CLI arguments
+- [X] `v0.2`: add support for the `--view` and `--watch` options
+- [ ] `v0.3`: tweaks based on what we learned so far
+- [ ] `v0.4`: add support for styles (should we name them output, defaults, etc.?)
