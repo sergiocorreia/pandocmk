@@ -59,7 +59,7 @@ def options2arguments(options):
 
 def get_yaml_metadata(fn):
 
-    # YAML chockes if we try to parse the whole file
+    # YAML chokes if we try to parse the whole file
     # Thus we'll select the YAML header and parse only that
     # See: https://stackoverflow.com/a/32496719/3977107
 
