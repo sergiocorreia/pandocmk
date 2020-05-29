@@ -33,9 +33,11 @@ todo:
   header-includes:
     - *default-header-includes
     - \usepackage{setspace}
+
 referee-report:
   geometry: margin=3cm
   mainfont: 'Times New Roman'
+
 notes:
   geometry: margin=2.5cm
   header-includes:

@@ -73,4 +73,8 @@ setup(
             'pandocmk=pandocmk:main'
         ],
     },
+
+    # Add the YAML file
+    # https://python-packaging.readthedocs.io/en/latest/non-code-files.html
+    include_package_data=True
 )

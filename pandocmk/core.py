@@ -12,7 +12,7 @@ from pathlib import Path
 import panflute
 
 from .view import run_viewer
-from .utils import get_metadata
+#from .utils import get_metadata
 from .metadata import options2arguments
 
 
@@ -35,8 +35,8 @@ def run_pandoc(pandoc_options, md_fn, ext, verbose):
 	pandoc_args.append(str(md_fn))
 	
 	if verbose:
-	    print('- Pandoc call:')
-	    print(f'  pandoc {" ".join(pandoc_args)}')
+	    print('[pandocmk] Pandoc call:')
+	    print(f'    pandoc {" ".join(pandoc_args)}')
 	
 	panflute.run_pandoc(args=pandoc_args)
 	return out_fn # In case we want to view the file later
@@ -57,4 +57,4 @@ def build_output(md_fn, view, timeit, tex, verbose, pandoc_options):
         run_viewer(out_fn, verbose)
 
     if verbose:
-        print(f'- File {out_fn} built!')
+        print(f'[pandocmk] file {out_fn} built!')

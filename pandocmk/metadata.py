@@ -9,6 +9,11 @@ Code for interfacing with the user through the CLI
 
 import yaml
 
+# Used to access static files (i.e. .yaml files)
+# https://stackoverflow.com/a/20885799/3977107
+from importlib.resources import read_text
+
+from .utils import write_metadata
 
 # ---------------------------
 # Functions
@@ -16,18 +21,44 @@ import yaml
 
 def get_pandoc_options(args, md_fn, verbose=False):
 
-    # Default options
+    # Option priority (right overrides left)
+    # hardcoded -> default yaml -> markdown header -> CLI
+
+    # Priority of Pandoc CLI options (right overrides left):
+    # hardcoded here -> Default YAML file -> Markdown YAML header -> pandocmk CLI options
+
+    # Set default Pandoc options
     options = {'from': 'markdown',
                'to': 'latex',
                'standalone': True,
                'pdf-engine': 'xelatex',
                'output': None}
 
-    # Get YAML header and use it to override default options
+    # Load default YAML styles
+    default_styles = read_text("pandocmk", "default-styles.yaml")
+    default_styles = yaml.safe_load(default_styles)
+
+    # Get markdown YAML header
     meta = get_yaml_metadata(md_fn)
+    style = meta.get('style') # If style does not exist, use "DEFAULT"!!! BUGBUG
+
+    # Override defaults with YAML styles
+    if style in default_styles:
+        if verbose:
+            print(f'[pandocmk] {style=}')
+        style_settings = default_styles[style]
+        
+        # Override Pandoc CLI options
+        options.update(style_settings.get('pandoc', {}))
+
+        # Add metadata YAML file
+        temp_yaml_fn = write_metadata(md_fn, style_settings)
+        options['metadata-file'] = str(temp_yaml_fn)
+    
+    # Override current Pandoc CLI options with markdown YAML header
     options.update(meta.get('pandoc', {}))
 
-    # Get CLI options and use them to override YAML options
+    # Override current Pandoc CLI options with CLI options
     options.update(arguments2options(args))
 
     return options

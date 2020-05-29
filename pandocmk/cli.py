@@ -43,11 +43,14 @@ pandocmk [FILES] [OPTIONS] [PANDOC OPTIONS]
 
 def main(file, view, watch, timeit, draft, tex, verbose, pandoc_args):
 
+    print(f'[pandocmk] {verbose=}')
+
     md_fn = Path(file)
     assert md_fn.suffix == '.md'
     assert md_fn.is_file()
 
     # Get Pandoc options from CLI and YAML
+    # This also creates a temporary {filename}.yaml file with metadata based on styles
     pandoc_options = get_pandoc_options(pandoc_args, md_fn, verbose)
 
     # Always run early on

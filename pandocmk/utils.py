@@ -8,7 +8,7 @@ Misc tools (for handling with metadata, etc.)
 # ---------------------------
 
 import yaml
-import panflute
+#import panflute
 
 
 # ---------------------------
@@ -22,9 +22,10 @@ def write_metadata(md_fn, style_options):
     return yaml_fn
 
 
-def get_metadata(fn):
-    with open(fn, 'r') as fh:
-        doc = panflute.convert_text(fh.read(), standalone=True)
-    
-    style = doc.get_metadata('style')
-    return {'style': style}
+#def get_metadata(fn):
+#    # NOT CURRENTLY USED
+#    with open(fn, 'r') as fh:
+#        doc = panflute.convert_text(fh.read(), standalone=True)
+#    
+#    style = doc.get_metadata('style')
+#    return {'style': style}
