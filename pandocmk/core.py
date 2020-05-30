@@ -7,6 +7,7 @@ Build command line call and run Pandoc
 # Imports
 # ---------------------------
 
+import time
 from pathlib import Path
 
 import panflute
@@ -38,9 +39,39 @@ def run_pandoc(pandoc_options, md_fn, ext, verbose):
 	    print('[pandocmk] Pandoc call:')
 	    print(f'    pandoc {" ".join(pandoc_args)}')
 	
+
+	wait = 0.05
+	while True:
+		err = inner_run_pandoc(pandoc_args)
+
+		if err:
+			# Set wait time in seconds, before trying again
+			if wait < 1:
+				wait * 2
+			else:
+				wait += 1
+			wait = min(5.0, wait)
+			if verbose:
+				print(f'[pandocmk] error encountered; sleeping for {wait:4.1f} seconds')
+			time.sleep(wait)
+		else:
+			break
+
 	panflute.run_pandoc(args=pandoc_args)
+
 	return out_fn # In case we want to view the file later
 
+
+def inner_run_pandoc(pandoc_args):
+	# If there is a latex error ("Undefined control sequence", etc.)
+	# we will abort without a huge traceback
+	# https://stackoverflow.com/questions/17784849/print-an-error-message-without-printing-a-traceback-and-close-the-program-when-a
+	try:
+		panflute.run_pandoc(args=pandoc_args)
+		return False # error = False
+	except IOError as err:
+		# raise SystemExit(err)
+		return True # error = True
 
 
 def build_output(md_fn, view, timeit, tex, verbose, pandoc_options):

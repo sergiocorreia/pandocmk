@@ -51,6 +51,9 @@ def get_pandoc_options(args, md_fn, verbose=False):
         # Override Pandoc CLI options
         options.update(style_settings.get('pandoc', {}))
 
+        # Flatten YAML file (when we include we often end up with lists-of-lists which look ugly)
+        style_settings = flatten_dict(style_settings)
+
         # Add metadata YAML file
         temp_yaml_fn = write_metadata(md_fn, style_settings)
         options['metadata-file'] = str(temp_yaml_fn)
@@ -62,6 +65,17 @@ def get_pandoc_options(args, md_fn, verbose=False):
     options.update(arguments2options(args))
 
     return options
+
+
+def flatten_dict(d):
+    assert isinstance(d, dict)
+    for k, v in d.items():
+        if isinstance(v, dict):
+            d[k] = flatten_dict(v)
+        elif isinstance(v, list):
+            v = [item if isinstance(item, list) else [item] for item in v]
+            d[k] = [subitem for item in v for subitem in item]
+    return d
 
 
 def arguments2options(args):

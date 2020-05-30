@@ -78,3 +78,10 @@ python -m twine upload dist/*
 - [X] `v0.2`: add support for the `--view` and `--watch` options
 - [ ] `v0.3`: tweaks based on what we learned so far
 - [ ] `v0.4`: add support for styles (should we name them output, defaults, etc.?)
+
+
+# Todo:
+
+- verbose output: timestamp when the last build was completed
+- Don't try to resume after CTRL+C while Pandoc/pdflatex are running
+- Only do `try ... except` with the `--watch` option.
