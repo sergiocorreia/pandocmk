@@ -50,3 +50,10 @@ notes:
   geometry: margin=2.5cm
   header-includes:
     - *math-header-includes
+
+syllabus:
+  <<: *default
+  pandoc:
+    template: syllabus.latex
+    to: pdf
+
