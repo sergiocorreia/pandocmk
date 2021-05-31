@@ -57,3 +57,25 @@ syllabus:
     template: syllabus.latex
     to: pdf
 
+paper:
+  <<: *default
+  #output:
+  #  #keep_tex: true
+  #  #latex_engine: pdflatex
+  numbersections: true
+  fontsize: 11pt
+  colorlinks: true
+  linkcolor: darkblue # Colour for normal internal links
+  citecolor: black # Colour for bibliographical citations
+  urlcolor: darkblue
+  #fontfamily: kpfonts # https://r2src.github.io/top10fonts/
+  #linestretch: 1.5 # activates \usepackage{setspace}
+  biblio-style: chicago
+  pandoc:
+    pdf-engine: pdflatex # xelatex # pdflatex
+    #citeproc: true
+    natbib: true  # it seems natbib doesn't work with PDF output?
+    template: ../templates/paper.latex
+    filter:
+      - pandoc-include # https://github.com/DCsunset/pandoc-include
+      - ../filters/media.py

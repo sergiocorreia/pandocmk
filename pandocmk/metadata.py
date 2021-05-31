@@ -19,10 +19,7 @@ from .utils import write_metadata
 # Functions
 # ---------------------------
 
-def get_pandoc_options(args, md_fn, verbose=False):
-
-    # Option priority (right overrides left)
-    # hardcoded -> default yaml -> markdown header -> CLI
+def get_pandoc_options(args, md_fn, verbose=False, strict=False):
 
     # Priority of Pandoc CLI options (right overrides left):
     # hardcoded here -> Default YAML file -> Markdown YAML header -> pandocmk CLI options
@@ -40,7 +37,7 @@ def get_pandoc_options(args, md_fn, verbose=False):
 
     # Get markdown YAML header
     meta = get_yaml_metadata(md_fn)
-    style = meta.get('style') # If style does not exist, use "DEFAULT"!!! BUGBUG
+    style = meta.get('style', 'default') # If style does not exist, use 'default'
 
     # Override defaults with YAML styles
     if style in default_styles:
@@ -57,6 +54,12 @@ def get_pandoc_options(args, md_fn, verbose=False):
         # Add metadata YAML file
         temp_yaml_fn = write_metadata(md_fn, style_settings)
         options['metadata-file'] = str(temp_yaml_fn)
+
+    else:
+        if strict:
+            raise SystemExit(f'[pandocmk] Error! {style=} not found')
+        else:
+            print(f'[pandocmk] Warning! {style=} not found')
     
     # Override current Pandoc CLI options with markdown YAML header
     options.update(meta.get('pandoc', {}))
@@ -99,7 +102,16 @@ def arguments2options(args):
 
 
 def options2arguments(options):
-    return [f'--{k}' if isinstance(v, bool) else f'--{k}={v}' for k, v in options.items()]
+    args = []
+    for k, v in options.items():
+        # If there are multiple filters, we need to expand them to multiple arguments:
+        # filter=[a,b] --> "-F a -F b"
+        if k == 'filter' and isinstance(v, list):  # not very robust (e.g. fails with tuple)
+            for vv in v:
+                args.append(f'--{k}={vv}')
+        else:
+            args.append(f'--{k}' if isinstance(v, bool) else f'--{k}={v}')
+    return args
 
 
 def get_yaml_metadata(fn):
@@ -107,6 +119,9 @@ def get_yaml_metadata(fn):
     # YAML chokes if we try to parse the whole file
     # Thus we'll select the YAML header and parse only that
     # See: https://stackoverflow.com/a/32496719/3977107
+
+    # First line outside of YAML directives or comments must be "---"
+    # Last line of YAML header must be "---" or "..."
 
     with fn.open(encoding='utf8') as fh:
         data = []
@@ -131,7 +146,7 @@ def get_yaml_metadata(fn):
                     continue
                 
                 # No more special cases
-                is_first_line = False
+                return {}
 
             # Detect last line
             if not is_first_line:

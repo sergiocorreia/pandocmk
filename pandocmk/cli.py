@@ -38,12 +38,14 @@ pandocmk [FILES] [OPTIONS] [PANDOC OPTIONS]
 @click.option('--draft', is_flag=True, default=False, help="NOT IMPLEMENTED. When building a Latex PDF, choose faster options (pdflatex, etc)")
 @click.option('--tex', is_flag=True, default=False, help="save .tex output besides .pdf")
 @click.option('--verbose', '-v', is_flag=True, default=False, help="show debugging information")
+@click.option('--strict', '-s', is_flag=True, default=True, help="stop with error if style not found")
 @click.argument('pandoc_args', nargs=-1, type=click.UNPROCESSED)
 
 
-def main(file, view, watch, timeit, draft, tex, verbose, pandoc_args):
+def main(file, view, watch, timeit, draft, tex, verbose, strict, pandoc_args):
 
-    print(f'[pandocmk] {verbose=}')
+    if verbose:
+        print(f'[pandocmk] {verbose=}')
 
     md_fn = Path(file)
     assert md_fn.suffix == '.md'
@@ -51,7 +53,7 @@ def main(file, view, watch, timeit, draft, tex, verbose, pandoc_args):
 
     # Get Pandoc options from CLI and YAML
     # This also creates a temporary {filename}.yaml file with metadata based on styles
-    pandoc_options = get_pandoc_options(pandoc_args, md_fn, verbose)
+    pandoc_options = get_pandoc_options(pandoc_args, md_fn, verbose=verbose, strict=strict)
 
     # Always run early on
     build_output(md_fn, view=view, timeit=timeit, tex=tex, verbose=verbose, pandoc_options=pandoc_options)
