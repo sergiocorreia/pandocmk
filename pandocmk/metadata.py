@@ -8,12 +8,13 @@ Code for interfacing with the user through the CLI
 # ---------------------------
 
 import yaml
+from pathlib import Path
 
 # Used to access static files (i.e. .yaml files)
 # https://stackoverflow.com/a/20885799/3977107
 from importlib.resources import read_text
 
-from .utils import write_metadata
+from .utils import write_metadata, get_filename
 
 # ---------------------------
 # Functions
@@ -44,7 +45,20 @@ def get_pandoc_options(args, md_fn, verbose=False, strict=False):
         if verbose:
             print(f'[pandocmk] {style=}')
         style_settings = default_styles[style]
-        
+
+        # Replace templates with those in the pandocmk template folder
+        # Note that we only do so for the default options, so users can change this
+        template = style_settings.get('pandoc', {}).get('template')
+        if template:
+            template = get_filename(template, subfolder='templates')
+            style_settings['pandoc']['template'] = template
+
+        # Same for filters
+        filters = style_settings.get('pandoc', {}).get('filter')
+        if filters:
+            filters = [get_filename(filter, subfolder='filters') for filter in filters] 
+            style_settings['pandoc']['filter'] = filters
+
         # Override Pandoc CLI options
         options.update(style_settings.get('pandoc', {}))
 
@@ -66,6 +80,20 @@ def get_pandoc_options(args, md_fn, verbose=False, strict=False):
 
     # Override current Pandoc CLI options with CLI options
     options.update(arguments2options(args))
+
+    # Bibtex hates relative bibliography paths, so we have to resolve to an absolute path
+    bibliography = options.get('bibliography')
+    if bibliography is not None:
+        fn = Path(bibliography).resolve()
+        assert fn.is_file()
+        fn = str(fn.with_suffix('')) # Bibtex cannot receive the .bib extension
+        fn = fn.replace('\\', '/') # Bibtex expects a/b, not a\b
+        print('!', fn)
+        options['bibliography'] = fn 
+    else:
+        print(options)
+        assert 0
+    
 
     return options
 

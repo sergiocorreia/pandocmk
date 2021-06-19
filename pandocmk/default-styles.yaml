@@ -69,13 +69,25 @@ paper:
   citecolor: black # Colour for bibliographical citations
   urlcolor: darkblue
   #fontfamily: kpfonts # https://r2src.github.io/top10fonts/
-  #linestretch: 1.5 # activates \usepackage{setspace}
+  linestretch: 1.5 # loads \usepackage{setspace} (we need this even if linestretch=1 because we use \setstretch in tables)
   biblio-style: chicago
+  cref: true # not sure if needed
+  papersize: letter
+  hyperrefoptions: bookmarksnumbered
+  header-includes:
+    #- \newcommand{\sym}[1]{\rlap{$#1$}} # https://tex.stackexchange.com/questions/47418/siunitx-specifying-custom-command-as-input-symbol
+    - \newcommand{\sym}[1]{{#1}} # https://tex.stackexchange.com/questions/47418/siunitx-specifying-custom-command-as-input-symbol
+    - \newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}
+    #
+    - \usepackage{cleveref} # must be loaded after hyperref
+    - \usepackage[toc,page,title]{appendix} # https://ctan.math.utah.edu/ctan/tex-archive/macros/latex/contrib/appendix/appendix.pdf
+    #- \usepackage{tabularx}
+    #- \usepackage{setspace}
   pandoc:
     pdf-engine: pdflatex # xelatex # pdflatex
     #citeproc: true
     natbib: true  # it seems natbib doesn't work with PDF output?
-    template: ../templates/paper.latex
+    template: paper.latex
     filter:
-      - pandoc-include # https://github.com/DCsunset/pandoc-include
+      - pandoc-include # this has to be the first filter; https://github.com/DCsunset/pandoc-include
       - ../filters/media.py

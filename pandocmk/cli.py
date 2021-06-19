@@ -37,12 +37,17 @@ pandocmk [FILES] [OPTIONS] [PANDOC OPTIONS]
 @click.option('--timeit', '--time', is_flag=True, default=False, help="show build time")
 @click.option('--draft', is_flag=True, default=False, help="NOT IMPLEMENTED. When building a Latex PDF, choose faster options (pdflatex, etc)")
 @click.option('--tex', is_flag=True, default=False, help="save .tex output besides .pdf")
+@click.option('--latexmk', is_flag=True, default=False, help="build pdf with latexmk; implies --tex")
 @click.option('--verbose', '-v', is_flag=True, default=False, help="show debugging information")
 @click.option('--strict', '-s', is_flag=True, default=True, help="stop with error if style not found")
+@click.option('--retry', '-r', is_flag=True, default=False, help="try again in case of error (useful with --watch)")
 @click.argument('pandoc_args', nargs=-1, type=click.UNPROCESSED)
 
 
-def main(file, view, watch, timeit, draft, tex, verbose, strict, pandoc_args):
+def main(file, view, watch, timeit, draft, tex, latexmk, verbose, strict, retry, pandoc_args):
+
+    if latexmk:
+        tex = True
 
     if verbose:
         print(f'[pandocmk] {verbose=}')
@@ -56,11 +61,11 @@ def main(file, view, watch, timeit, draft, tex, verbose, strict, pandoc_args):
     pandoc_options = get_pandoc_options(pandoc_args, md_fn, verbose=verbose, strict=strict)
 
     # Always run early on
-    build_output(md_fn, view=view, timeit=timeit, tex=tex, verbose=verbose, pandoc_options=pandoc_options)
+    build_output(md_fn, view=view, timeit=timeit, tex=tex, latexmk=latexmk, retry=retry, verbose=verbose, pandoc_options=pandoc_options)
 
     # Run on-demand if required
     if watch:
-        monitor_file(md_fn, timeit=timeit, tex=tex, verbose=verbose, pandoc_options=pandoc_options)        
+        monitor_file(md_fn, timeit=timeit, tex=tex, latexmk=latexmk, retry=retry, verbose=verbose, pandoc_options=pandoc_options)
         monitor_file(path, md_fn, timeit, verbose, pandoc_args)
 
 
