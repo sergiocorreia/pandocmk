@@ -75,11 +75,18 @@ def get_pandoc_options(args, md_fn, verbose=False, strict=False):
         else:
             print(f'[pandocmk] Warning! {style=} not found')
     
-    # Override current Pandoc CLI options with markdown YAML header
-    options.update(meta.get('pandoc', {}))
+    # Override current options with markdown YAML header
+    new_options = meta.get('pandoc', {})
+    #if 'header-includes' in options and 'header-includes' in new_options:
+    #    new_options['header-includes'] = options['header-includes'] + new_options['header-includes']
+    options.update(new_options)
 
-    # Override current Pandoc CLI options with CLI options
-    options.update(arguments2options(args))
+    # Override current options with CLI options
+    new_options = arguments2options(args)
+    #if 'header-includes' in options and 'header-includes' in new_options:
+    #    new_options['header-includes'] = options['header-includes'] + new_options['header-includes']
+    options.update(new_options)
+
 
     # Bibtex hates relative bibliography paths, so we have to resolve to an absolute path
     bibliography = options.get('bibliography')
@@ -88,12 +95,7 @@ def get_pandoc_options(args, md_fn, verbose=False, strict=False):
         assert fn.is_file()
         fn = str(fn.with_suffix('')) # Bibtex cannot receive the .bib extension
         fn = fn.replace('\\', '/') # Bibtex expects a/b, not a\b
-        print('!', fn)
         options['bibliography'] = fn 
-    else:
-        print(options)
-        assert 0
-    
 
     return options
 

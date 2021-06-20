@@ -409,6 +409,9 @@ $if(csl-refs)$
 \newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
 \newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 $endif$
+$for(base-header-includes)$
+$base-header-includes$
+$endfor$
 $for(header-includes)$
 $header-includes$
 $endfor$

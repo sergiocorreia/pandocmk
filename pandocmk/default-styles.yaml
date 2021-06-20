@@ -9,7 +9,7 @@
 
 default: &default
   geometry: margin=2.5cm
-  header-includes: &default-header-includes
+  base-header-includes: &default-header-includes
     - \newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}
     - \usepackage{tabularx}
     - \usepackage{setspace}
@@ -31,7 +31,7 @@ math-header-includes: &math-header-includes
 todo:
   <<: *default
   geometry: margin=3cm
-  header-includes:
+  base-header-includes:
     - *default-header-includes
 
 referee-report:
@@ -39,7 +39,7 @@ referee-report:
   geometry: margin=3cm
   mainfont: 'Times New Roman'
   numbersections: true
-  header-includes:
+  base-header-includes:
     - *default-header-includes
     - \doublespacing
   pandoc:
@@ -48,7 +48,7 @@ referee-report:
 
 notes:
   geometry: margin=2.5cm
-  header-includes:
+  base-header-includes:
     - *math-header-includes
 
 syllabus:
@@ -74,10 +74,10 @@ paper:
   cref: true # not sure if needed
   papersize: letter
   hyperrefoptions: bookmarksnumbered
-  header-includes:
+  base-header-includes:
     #- \newcommand{\sym}[1]{\rlap{$#1$}} # https://tex.stackexchange.com/questions/47418/siunitx-specifying-custom-command-as-input-symbol
     - \newcommand{\sym}[1]{{#1}} # https://tex.stackexchange.com/questions/47418/siunitx-specifying-custom-command-as-input-symbol
-    - \newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}
+    - '\newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}'
     #
     - \usepackage{cleveref} # must be loaded after hyperref
     - \usepackage[toc,page,title]{appendix} # https://ctan.math.utah.edu/ctan/tex-archive/macros/latex/contrib/appendix/appendix.pdf

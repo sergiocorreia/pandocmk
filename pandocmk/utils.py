@@ -35,6 +35,7 @@ def write_metadata(md_fn, style_options):
 def get_filename(fn, subfolder=None):
 	path = Path(__file__).resolve().parent
 	fixed_fn = (path / subfolder / fn) if subfolder else (path / fn)
+	fixed_fn = fixed_fn.resolve()
 
 	# Fail gracefully
 	fn = str(fixed_fn) if fixed_fn.is_file() else fn
