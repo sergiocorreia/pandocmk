@@ -63,6 +63,7 @@ paper:
   #  #keep_tex: true
   #  #latex_engine: pdflatex
   numbersections: true
+  titlepage: true
   fontsize: 11pt
   colorlinks: true
   linkcolor: darkblue # Colour for normal internal links
@@ -79,10 +80,40 @@ paper:
     - \newcommand{\sym}[1]{{#1}} # https://tex.stackexchange.com/questions/47418/siunitx-specifying-custom-command-as-input-symbol
     - '\newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}'
     #
-    - \usepackage{cleveref} # must be loaded after hyperref
+    - \usepackage[noabbrev]{cleveref} # must be loaded after hyperref
     - \usepackage[toc,page,title]{appendix} # https://ctan.math.utah.edu/ctan/tex-archive/macros/latex/contrib/appendix/appendix.pdf
     #- \usepackage{tabularx}
     #- \usepackage{setspace}
+  pandoc:
+    pdf-engine: pdflatex # xelatex # pdflatex
+    #citeproc: true
+    natbib: true  # it seems natbib doesn't work with PDF output?
+    template: paper.latex
+    filter:
+      - pandoc-include # this has to be the first filter; https://github.com/DCsunset/pandoc-include
+      - ../filters/media.py
+
+proposal:
+  <<: *default
+  numbersections: true
+  titlepage: false
+  fontsize: 10pt
+  geometry: "left=2.5cm,right=2.5cm,top=0cm,bottom=1cm"
+  colorlinks: true
+  linkcolor: darkblue # Colour for normal internal links
+  citecolor: black # Colour for bibliographical citations
+  urlcolor: darkblue
+  #fontfamily: kpfonts # https://r2src.github.io/top10fonts/
+  linestretch: 1.0 # loads \usepackage{setspace} (we need this even if linestretch=1 because we use \setstretch in tables)
+  biblio-style: chicago
+  cref: true # not sure if needed
+  papersize: letter
+  hyperrefoptions: bookmarksnumbered
+  base-header-includes:
+    - \newcommand{\sym}[1]{{#1}} # https://tex.stackexchange.com/questions/47418/siunitx-specifying-custom-command-as-input-symbol
+    - '\newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}'
+    - \usepackage[noabbrev]{cleveref} # must be loaded after hyperref
+    - \usepackage[toc,page,title]{appendix} # https://ctan.math.utah.edu/ctan/tex-archive/macros/latex/contrib/appendix/appendix.pdf
   pandoc:
     pdf-engine: pdflatex # xelatex # pdflatex
     #citeproc: true

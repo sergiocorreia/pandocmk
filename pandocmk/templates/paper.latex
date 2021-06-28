@@ -485,6 +485,7 @@ $if(beamer)$
 \frame{\titlepage}
 $else$
 \maketitle
+$if(status)$\vspace{5mm}\begin{center} $status$ \end{center}\vspace{20mm}$endif$
 $if(abstract)$
 \begin{abstract}
 $abstract$
@@ -503,7 +504,7 @@ $if(keywords)$
 \keywords{$for(keywords)$$keywords$$sep$, $endfor$}
 $endif$
 \pagenumbering{gobble}
-\clearpage
+$if(titlepage)$\clearpage$endif$
 \pagenumbering{arabic}
 $endif$
 $endif$
