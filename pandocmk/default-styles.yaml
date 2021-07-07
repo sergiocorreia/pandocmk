@@ -98,7 +98,7 @@ proposal:
   numbersections: true
   titlepage: false
   fontsize: 10pt
-  geometry: "left=2.5cm,right=2.5cm,top=0cm,bottom=1cm"
+  geometry: "left=2.5cm,right=2.5cm,top=1.5cm,bottom=1.5cm"
   colorlinks: true
   linkcolor: darkblue # Colour for normal internal links
   citecolor: black # Colour for bibliographical citations
