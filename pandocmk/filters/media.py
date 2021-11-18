@@ -75,7 +75,7 @@ def table_fenced_action(options, data, element, doc):
     is_landscape = options.get('orientation', 'portrait') == 'landscape'
     size = options.get('size', 5)
 
-    pagebreak = doc.metadata.get('media-pagebreak', False) # Force pagebreak after media
+    pagebreak = doc.get_metadata('media-pagebreak', False) # Force pagebreak after media
     media_in_back = decide_media_on_back(element, doc)
 
     #title_suffix = ' --- ' if subtitle else ''
@@ -128,7 +128,7 @@ def figure_fenced_action(options, data, element, doc):
     is_landscape = options.get('orientation', 'portrait') == 'landscape'
     size = options.get('size', 5)
 
-    pagebreak = doc.metadata.get('media-pagebreak', False) # Force pagebreak after media
+    pagebreak = doc.get_metadata('media-pagebreak', False) # Force pagebreak after media
     media_in_back = decide_media_on_back(element, doc)
 
     #title_suffix = ' --- ' if subtitle else ''
@@ -174,7 +174,7 @@ def stlog_fenced_action(options, data, element, doc):
     source = options['source'] # mandatory
     size = options.get('size', 5)
 
-    pagebreak = doc.metadata.get('media-pagebreak', False) # Force pagebreak after media
+    pagebreak = doc.get_metadata('media-pagebreak', False) # Force pagebreak after media
     media_in_back = decide_media_on_back(element, doc)
 
     # OVERRIDE MEDIA ON BACK
@@ -235,7 +235,7 @@ def find_backmatter(doc):
 
 
 def decide_media_on_back(elem, doc):
-    media_in_back = doc.metadata.get('media-in-back', True) # Move media to back
+    media_in_back = doc.    get_metadata('media-in-back', True) # Move media to back
 
     # Don't move to back if we are already after the backmatter i.e. if we are in the appendix
     # Note that this code is fragile (doesn't work if it's nested within divs)
