@@ -41,6 +41,7 @@ def run_pandoc(pandoc_options, md_fn, ext, retry, verbose):
     if verbose:
         print('[pandocmk] Pandoc call:')
         print(f'    pandoc {" ".join(pandoc_args)}')
+        tic = time.perf_counter()
     
     wait = 0.05
     while True:
@@ -62,7 +63,8 @@ def run_pandoc(pandoc_options, md_fn, ext, retry, verbose):
             time.sleep(wait)
         else:
             if verbose:
-                print(f'[pandocmk] Pandoc call completed')
+                toc = time.perf_counter()
+                print(f'[pandocmk] Pandoc call completed in  {toc - tic:0.1f} seconds')
             break
 
     return out_fn # In case we want to view the file later
@@ -131,7 +133,6 @@ def build_output(md_fn, view, timeit, tex, latexmk, retry, verbose, pandoc_optio
         if out_fn is None:
             exit()
 
-
     # Build .pdf output through Pandoc
     if latexmk:
         assert tex
@@ -157,6 +158,7 @@ def run_latexmk(fn, verbose):
     if verbose:
         print('[pandocmk] latexmk call:')
         print(f'    {" ".join(cmd)}')
+        tic = time.perf_counter()
 
     # We will want to keep our base folder neat so we'll move as much as possible to ./tmp
     tmp_path = fn.parent / 'tmp'
@@ -166,6 +168,10 @@ def run_latexmk(fn, verbose):
 
     # Run latexmk
     panflute.shell(cmd)
+
+    if verbose:
+        toc = time.perf_counter()
+        print(f'[pandocmk] latexmk call completed in  {toc - tic:0.1f} seconds')
 
     # Copy .tex file
     shutil.move(fn, tmp_path / fn.name)

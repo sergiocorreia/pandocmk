@@ -172,6 +172,7 @@ def figures_fenced_action(options, data, element, doc):
         panel_source = panel['source']
         panel_width = panel.get('size', default_width)
         panel_newline = panel.get('newline', False)
+        panel_border = panel.get('border', False)
 
 
         panel_note = None # Not used for now
@@ -186,7 +187,9 @@ def figures_fenced_action(options, data, element, doc):
         snippet.append(f'  %%%% Panel {i} %%%%')
         snippet.append(rf'  \begin{{subfigure}}{{{panel_width}\textwidth}}')
         snippet.append(rf'    \centering')
+        if panel_border: snippet.append(rf'    \fbox{{')
         snippet.append(rf'    \includegraphics[width=0.9\linewidth]{{{panel_source}}}')
+        if panel_border: snippet.append(rf'    }}')
         snippet.append(rf'    \caption{{{panel_title}}}')
         snippet.append(rf'    \label{{{panel_label}}}')
         snippet.append(rf'  \end{{subfigure}}%\hspace*{{-0.1em}}')
@@ -327,7 +330,7 @@ def main(doc=None):
             'figure': figure_fenced_action,
             'figures': figures_fenced_action,
             'stlog': stlog_fenced_action}
-    return pf.run_filter(action=pf.yaml_filter, prepare=prepare, finalize=finalize, tags=tags, doc=doc) 
+    return pf.run_filter(action=pf.yaml_filter, prepare=prepare, finalize=finalize, tags=tags, doc=doc, walk_inlines=False) 
 
 
 if __name__ == '__main__':

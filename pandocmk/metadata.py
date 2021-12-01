@@ -75,8 +75,15 @@ def get_pandoc_options(args, md_fn, verbose=False, strict=False):
         else:
             print(f'[pandocmk] Warning! {style=} not found')
     
-    # Override current options with markdown YAML header
+    # Retrieve markdown YAML header
     new_options = meta.get('pandoc', {})
+
+    # If YAML header has a 'metadata-file' value then we must prevent that value overwriting the just-created .yaml file.
+    # Instead, we will append it to the end of a list
+    if 'metadata-file' in new_options:
+        new_options['metadata-file'] = [options['metadata-file'], new_options['metadata-file']]
+
+    # Override current options with markdown YAML header
     #if 'header-includes' in options and 'header-includes' in new_options:
     #    new_options['header-includes'] = options['header-includes'] + new_options['header-includes']
     options.update(new_options)
@@ -86,7 +93,6 @@ def get_pandoc_options(args, md_fn, verbose=False, strict=False):
     #if 'header-includes' in options and 'header-includes' in new_options:
     #    new_options['header-includes'] = options['header-includes'] + new_options['header-includes']
     options.update(new_options)
-
 
     # Bibtex hates relative bibliography paths, so we have to resolve to an absolute path
     bibliography = options.get('bibliography')
@@ -136,7 +142,7 @@ def options2arguments(options):
     for k, v in options.items():
         # If there are multiple filters, we need to expand them to multiple arguments:
         # filter=[a,b] --> "-F a -F b"
-        if k == 'filter' and isinstance(v, list):  # not very robust (e.g. fails with tuple)
+        if k in ('filter', 'metadata-file') and isinstance(v, (list, tuple)):  # not very robust
             for vv in v:
                 args.append(f'--{k}={vv}')
         else:
