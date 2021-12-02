@@ -138,7 +138,9 @@ def build_output(md_fn, view, timeit, tex, latexmk, retry, verbose, pandoc_optio
         assert tex
         # latexmk academic-markdown.tex -pdf -halt-on-error -quiet
         tex_fn = md_fn.with_suffix('.tex')
-        out_fn = run_latexmk(tex_fn, verbose=verbose)
+        pdf_engine = pandoc_options[ 'pdf-engine']
+        assert pdf_engine in ('xelatex', 'pdflatex')  # We can add more engines, but need to customize the -latexmk- call accordingly
+        out_fn = run_latexmk(tex_fn, pdf_engine, verbose=verbose)
     else:
         out_fn = run_pandoc(pandoc_options, md_fn, 'pdf', retry, verbose)
 
@@ -151,8 +153,12 @@ def build_output(md_fn, view, timeit, tex, latexmk, retry, verbose, pandoc_optio
         print(f"[pandocmk] file '{out_fn}' built in {toc - tic:0.1f} seconds")
 
 
-def run_latexmk(fn, verbose):
+def run_latexmk(fn, pdf_engine, verbose):
     options = {'pdf': True, 'halt-on-error': True, 'quiet': True, 'output-directory': './tmp'}
+
+    if pdf_engine == 'xelatex':
+        options['pdfxe'] = True
+
     cmd = ['latexmk', str(fn)] + options2arguments(options)
 
     if verbose:

@@ -57,6 +57,13 @@ syllabus:
     template: syllabus.latex
     to: pdf
 
+slides:
+  pandoc:
+    to: beamer
+  theme: metropolis
+  filter:
+    - ../filters/media.py
+
 paper:
   <<: *default
   #output:
