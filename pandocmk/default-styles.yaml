@@ -69,6 +69,7 @@ slides:
     to: beamer
     filter:
     - ../filters/media.py
+    - pandoc-latex-fontsize
   theme: metropolis
   media-in-back: False
   base-header-includes:

@@ -129,7 +129,8 @@ def figure_fenced_action(options, data, element, doc):
     snippet.append(r'  \begin{figure}[htpb]')
     snippet.append(r'    \centering')
     snippet.append(rf'    \includegraphics[width={width}\textwidth]{{"{source}"}}')
-    snippet.append(rf'    \caption{{\textbf{{{title}{title_suffix}}}{subtitle}}}')
+    if title or subtitle:
+        snippet.append(rf'    \caption{{\textbf{{{title}{title_suffix}}}{subtitle}}}')
     snippet.append(rf'    \label{{{label}}}')
     snippet.append(r'  \end{figure}')
     if is_landscape: snippet.append(r'\end{landscape}')
