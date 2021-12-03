@@ -20,4 +20,10 @@ initexmf --edit-config-file updmap
 | Map zi4.map 
 | Now in the command window, type
 initexmf --mkmaps
+updmap
 ```
+
+
+### Package `setspace` is not compatible with beamer footnotes
+
+- So we can't have any `setstretch` in the tex

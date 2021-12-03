@@ -3,6 +3,7 @@
 # Nodes are defined by an anchor "&" after the colon ("foo: &foofoo")
 # Nodes are aliased through an asterisk "*"
 
+
 ###############################################################
 #                        Default style
 ###############################################################
@@ -14,6 +15,7 @@ default: &default
     - \usepackage{tabularx}
     - \usepackage{setspace}
 
+
 ###############################################################
 #                   Math latex definitions
 ###############################################################
@@ -23,6 +25,7 @@ math-header-includes: &math-header-includes
   - \usepackage{bbm}
   - \newcommand{\1}[1]{\mathbbm{1}_{#1}}
   - \newcommand*{\QED}{\hfill\ensuremath{\blacksquare}\medskip{}}
+
 
 ###############################################################
 #                       General Styles
@@ -46,10 +49,12 @@ referee-report:
     citeproc: True
     #natbib: True
 
+
 notes:
   geometry: margin=2.5cm
   base-header-includes:
     - *math-header-includes
+
 
 syllabus:
   <<: *default
@@ -57,12 +62,18 @@ syllabus:
     template: syllabus.latex
     to: pdf
 
+
 slides:
   pandoc:
+    template: paper.latex
     to: beamer
-  theme: metropolis
-  filter:
+    filter:
     - ../filters/media.py
+  theme: metropolis
+  media-in-back: False
+  base-header-includes:
+    - '\newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}'
+
 
 paper:
   <<: *default
@@ -99,6 +110,7 @@ paper:
     filter:
       - pandoc-include # this has to be the first filter; https://github.com/DCsunset/pandoc-include
       - ../filters/media.py
+
 
 proposal:
   <<: *default
