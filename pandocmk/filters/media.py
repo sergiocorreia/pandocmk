@@ -29,18 +29,18 @@ def prepare(doc):
     # Find position of backmatter so we don't move anything after it
     doc.backmatter_index = find_backmatter(doc)
 
-    # Place bibliography
-    # a) Before backmatter if it exists
-    # b) At the end of the document otherwise
-    bibliography = doc.get_metadata('bibliography')
-    if bibliography:
-        pos = doc.backmatter_index if doc.backmatter_index is not None else len(doc.content) + 1
-        snippet = [r'\clearpage{}', rf'\bibliography{{{bibliography}}}']
-        snippet = pf.RawBlock('\n'.join(snippet), format='latex')
-        doc.content.insert(pos, snippet)
-        #doc.content[pos:pos] = snippet
-        if doc.backmatter_index:
-            doc.backmatter_index += 1
+    # # Place bibliography
+    # # a) Before backmatter if it exists
+    # # b) At the end of the document otherwise
+    # bibliography = doc.get_metadata('bibliography')
+    # if bibliography:
+    #     pos = doc.backmatter_index if doc.backmatter_index is not None else len(doc.content) + 1
+    #     snippet = [r'\clearpage{}', rf'\bibliography{{{bibliography}}}']
+    #     snippet = pf.RawBlock('\n'.join(snippet), format='latex')
+    #     doc.content.insert(pos, snippet)
+    #     #doc.content[pos:pos] = snippet
+    #     if doc.backmatter_index:
+    #         doc.backmatter_index += 1
 
 
 def finalize(doc):
