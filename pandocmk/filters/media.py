@@ -112,6 +112,7 @@ def figure_fenced_action(options, data, element, doc):
 
     source = options['source'] # mandatory
     is_landscape = options.get('orientation', 'portrait') == 'landscape'
+    is_tikz = options.get('tikz', False)
     width = options.get('size', 1)
 
     pagebreak = doc.get_metadata('media-pagebreak', False) # Force pagebreak after media
@@ -128,7 +129,12 @@ def figure_fenced_action(options, data, element, doc):
     if is_landscape: snippet.append(r'\begin{landscape}')
     snippet.append(r'  \begin{figure}[htpb]')
     snippet.append(r'    \centering')
-    snippet.append(rf'    \includegraphics[width={width}\textwidth]{{"{source}"}}')
+
+    if is_tikz:
+        snippet.append(rf'    \input{{"{source}"}}')
+    else:
+        snippet.append(rf'    \includegraphics[width={width}\textwidth]{{"{source}"}}')
+    
     if title or subtitle:
         snippet.append(rf'    \caption{{\textbf{{{title}{title_suffix}}}{subtitle}}}')
     snippet.append(rf'    \label{{{label}}}')
