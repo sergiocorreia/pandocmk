@@ -23,7 +23,7 @@ from .metadata import options2arguments
 # Functions
 # ---------------------------
 
-def run_pandoc(pandoc_options, md_fn, ext, retry, verbose):
+def run_pandoc(pandoc_options, md_fn, ext, verbose):
     assert ext in ('pdf', 'tex')
     assert isinstance(pandoc_options, dict)
 
@@ -43,63 +43,13 @@ def run_pandoc(pandoc_options, md_fn, ext, retry, verbose):
         print(f'    pandoc {" ".join(pandoc_args)}')
         tic = time.perf_counter()
     
-    wait = 0.05
-    while True:
-        err = inner_run_pandoc(pandoc_args)
+    panflute.run_pandoc(args=pandoc_args)
 
-        if err and not retry:
-            if verbose:
-                print(f'[pandocmk] error encountered; stopping')
-            return None
-        elif err:
-            # Set wait time in seconds, before trying again
-            if wait < 1:
-                wait * 2
-            else:
-                wait += 1
-            wait = min(5.0, wait)
-            if verbose:
-                print(f'[pandocmk] error encountered; sleeping for {wait:4.1f} seconds')
-            time.sleep(wait)
-        else:
-            if verbose:
-                toc = time.perf_counter()
-                print(f'[pandocmk] Pandoc call completed in  {toc - tic:0.1f} seconds')
-            break
+    if verbose:
+        toc = time.perf_counter()
+        print(f'[pandocmk] Pandoc call completed in  {toc - tic:0.1f} seconds')
 
     return out_fn # In case we want to view the file later
-
-
-def inner_run_pandoc(pandoc_args):
-    # If there is a latex error ("Undefined control sequence", etc.)
-    # we will abort without a huge traceback
-    # https://stackoverflow.com/questions/17784849/print-an-error-message-without-printing-a-traceback-and-close-the-program-when-a
-    try:
-        panflute.run_pandoc(args=pandoc_args)
-        return False  # error = False
-    except IOError as err:
-        if error_is_fatal(err):
-            raise SystemExit()
-        return True # error = True
-
-
-def error_is_fatal(e):
-    '''If there is a deeper error (such as a not-found filter) we will abort altogether'''
-
-    # If there are no arguments (i.e. text message then we can't do anything)
-    if not e.args:
-        return False
-
-    if 'Could not find executable' in e.args[0]:
-        return True
-
-    if 'invalid api version' in e.args[0]:
-        return True
-    
-    if 'Unknown option' in e.args[0]:
-        return True
-    
-    return False
 
 
 def fix_citation_options(options, ext):
@@ -121,14 +71,14 @@ def fix_citation_options(options, ext):
         options[new_option] = True
 
 
-def build_output(md_fn, view, timeit, tex, latexmk, retry, verbose, pandoc_options):
+def build_output(md_fn, view, timeit, tex, latexmk,verbose, pandoc_options):
 
     if verbose:
         tic = time.perf_counter()
 
     # Build .tex output through Pandoc
     if tex:
-        out_fn = run_pandoc(pandoc_options, md_fn, 'tex', retry, verbose)
+        out_fn = run_pandoc(pandoc_options, md_fn, 'tex', verbose)
         # Exit if pandoc call failed (so we don't call latexmk or pandoc again)
         if out_fn is None:
             exit()
@@ -142,7 +92,7 @@ def build_output(md_fn, view, timeit, tex, latexmk, retry, verbose, pandoc_optio
         assert pdf_engine in ('xelatex', 'pdflatex')  # We can add more engines, but need to customize the -latexmk- call accordingly
         out_fn = run_latexmk(tex_fn, pdf_engine, verbose=verbose)
     else:
-        out_fn = run_pandoc(pandoc_options, md_fn, 'pdf', retry, verbose)
+        out_fn = run_pandoc(pandoc_options, md_fn, 'pdf', verbose)
 
     # View PDF in SumatraPDF
     if view:

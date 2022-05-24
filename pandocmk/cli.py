@@ -8,7 +8,9 @@ Code for interfacing with the user through the CLI
 # ---------------------------
 
 from pathlib import Path
+
 import click
+import backoff
 
 from .version import __version__
 from .metadata import get_pandoc_options
@@ -43,8 +45,61 @@ pandocmk [FILES] [OPTIONS] [PANDOC OPTIONS]
 @click.option('--retry', '-r', is_flag=True, default=False, help="try again in case of error (useful with --watch)")
 @click.argument('pandoc_args', nargs=-1, type=click.UNPROCESSED)
 
-
 def main(file, view, watch, timeit, draft, tex, latexmk, verbose, strict, retry, pandoc_args):
+
+    # https://github.com/litl/backoff/blob/master/backoff/_wait_gen.py
+    if retry:
+        f = backoff.on_exception(wait_gen=backoff.expo, exception=Exception,
+                                 base=1, max_value=20,
+                                 max_tries=1000, max_time=600, giveup=error_is_fatal, on_backoff=print_backoff)(inner_main)
+    else:
+        f = inner_main
+
+    print('RUNNING MAIN')
+    f(file, view, watch, timeit, draft, tex, latexmk, verbose, strict, pandoc_args)
+
+    # TODO: Look at 
+    # error_is_fatal      
+
+
+def print_backoff(args):
+    pass
+    #print(args)
+
+
+def error_is_fatal(e):
+    '''If there is a deeper error (such as a not-found filter) we will abort altogether'''
+
+    # If there are no arguments (i.e. text message then we can't do anything)
+    if not e.args:
+        return False
+
+    if 'Could not find executable' in e.args[0]:
+        return True
+
+    if 'invalid api version' in e.args[0]:
+        return True
+    
+    if 'Unknown option' in e.args[0]:
+        return True
+    
+    return False
+
+
+#def inner_run_pandoc(pandoc_args):
+#    # If there is a latex error ("Undefined control sequence", etc.)
+#    # we will abort without a huge traceback
+#    # https://stackoverflow.com/questions/17784849/print-an-error-message-without-printing-a-traceback-and-close-the-program-when-a
+#    try:
+#        panflute.run_pandoc(args=pandoc_args)
+#        return False  # error = False
+#    except IOError as err:
+#        if error_is_fatal(err):
+#            raise SystemExit()
+#        return True # error = True
+
+
+def inner_main(file, view, watch, timeit, draft, tex, latexmk, verbose, strict, pandoc_args):
 
     if latexmk:
         tex = True
@@ -61,12 +116,12 @@ def main(file, view, watch, timeit, draft, tex, latexmk, verbose, strict, retry,
     pandoc_options = get_pandoc_options(pandoc_args, md_fn, verbose=verbose, strict=strict)
 
     # Always run early on
-    build_output(md_fn, view=view, timeit=timeit, tex=tex, latexmk=latexmk, retry=retry, verbose=verbose, pandoc_options=pandoc_options)
+    build_output(md_fn, view=view, timeit=timeit, tex=tex, latexmk=latexmk, verbose=verbose, pandoc_options=pandoc_options)
 
     # Run on-demand if required
     if watch:
-        monitor_file(md_fn, timeit=timeit, tex=tex, latexmk=latexmk, retry=retry, verbose=verbose, pandoc_options=pandoc_options)
-        monitor_file(path, md_fn, timeit, verbose, pandoc_args)
+        monitor_file(md_fn, timeit=timeit, tex=tex, latexmk=latexmk, verbose=verbose, pandoc_options=pandoc_options)
+        #monitor_file(path, md_fn, timeit, verbose, pandoc_args)
 
 
 if __name__ == '__main__':

@@ -18,13 +18,12 @@ from .core import build_output
 
 class MarkdownUpdateHandler(FileSystemEventHandler):
 
-    def __init__(self, fn, timeit, tex, latexmk, retry, verbose, pandoc_options):
+    def __init__(self, fn, timeit, tex, latexmk, verbose, pandoc_options):
         self.fn = fn
         self.fn = fn
         self.timeit = timeit
         self.tex = tex
         self.latexmk = latexmk
-        self.retry = retry
         self.verbose = verbose
         self.pandoc_options = pandoc_options
         self.last_update =  datetime.datetime(1,1,1) # Pick any old datetime
@@ -47,8 +46,9 @@ class MarkdownUpdateHandler(FileSystemEventHandler):
         #if (fn_modified.suffix != '.md'):
         #    return
         
-        if fn_modified.name != self.fn.name:
-            return
+        #if fn_modified.name != self.fn.name:
+        if fn_modified.suffix != '.md':
+            return # What if another section gets modified?
 
         t = datetime.datetime.now()
         delta = t - self.last_update
@@ -62,7 +62,7 @@ class MarkdownUpdateHandler(FileSystemEventHandler):
         print(f' - File "{self.fn}" modified ({t.strftime("%I:%M:%S %p")})')
         # view=False as we don't need SumatraPDF to steal windows focus every time we save
         #self.last_update = t
-        build_output(self.fn, view=False, timeit=self.timeit, tex=self.tex, latexmk=self.latexmk, retry=self.retry, verbose=self.verbose, pandoc_options=self.pandoc_options)
+        build_output(self.fn, view=False, timeit=self.timeit, tex=self.tex, latexmk=self.latexmk, verbose=self.verbose, pandoc_options=self.pandoc_options)
         self.last_update = datetime.datetime.now()
         #print(event.src_path, event.key, event.event_type)
 
@@ -71,12 +71,12 @@ class MarkdownUpdateHandler(FileSystemEventHandler):
 # Functions
 # ---------------------------
 
-def monitor_file(md_fn, timeit, tex, latexmk, retry, verbose, pandoc_options):
+def monitor_file(md_fn, timeit, tex, latexmk, verbose, pandoc_options):
 
     path = '.'
     print(f'Monitoring file "{md_fn}" in directory {path}')
 
-    event_handler = MarkdownUpdateHandler(fn=md_fn, timeit=timeit, tex=tex, latexmk=latexmk, retry=retry, verbose=verbose, pandoc_options=pandoc_options)
+    event_handler = MarkdownUpdateHandler(fn=md_fn, timeit=timeit, tex=tex, latexmk=latexmk, verbose=verbose, pandoc_options=pandoc_options)
 
     observer = Observer(timeout=1)
     observer.schedule(event_handler, path, recursive=False)
