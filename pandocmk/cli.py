@@ -47,24 +47,37 @@ pandocmk [FILES] [OPTIONS] [PANDOC OPTIONS]
 
 def main(file, view, watch, timeit, draft, tex, latexmk, verbose, strict, retry, pandoc_args):
 
+    if latexmk:
+        tex = True
+
+    if verbose:
+        print(f'[pandocmk] {verbose=}')
+
+    md_fn = Path(file)
+    assert md_fn.suffix == '.md'
+    assert md_fn.is_file()
+
+    # Get Pandoc options from CLI and YAML
+    # This also creates a temporary {filename}.yaml file with metadata based on styles
+    pandoc_options = get_pandoc_options(pandoc_args, md_fn, verbose=verbose, strict=strict)
+
+    # Optionally add watch
+    f = monitor_file if watch else build_output 
+
+    # Optionally add back-off for errors
     # https://github.com/litl/backoff/blob/master/backoff/_wait_gen.py
     if retry:
         f = backoff.on_exception(wait_gen=backoff.expo, exception=Exception,
                                  base=1, max_value=20,
-                                 max_tries=1000, max_time=600, giveup=error_is_fatal, on_backoff=print_backoff)(inner_main)
-    else:
-        f = inner_main
+                                 max_tries=1000, max_time=600, giveup=error_is_fatal, on_backoff=print_backoff)(f)
 
-    print('RUNNING MAIN')
-    f(file, view, watch, timeit, draft, tex, latexmk, verbose, strict, pandoc_args)
-
-    # TODO: Look at 
-    # error_is_fatal      
+    f(md_fn, view=view, timeit=timeit, tex=tex, latexmk=latexmk, verbose=verbose, pandoc_options=pandoc_options)
 
 
 def print_backoff(args):
     pass
     #print(args)
+    print('BACKOFF CAUGHT AN ERROR >>>')
 
 
 def error_is_fatal(e):
@@ -97,31 +110,6 @@ def error_is_fatal(e):
 #        if error_is_fatal(err):
 #            raise SystemExit()
 #        return True # error = True
-
-
-def inner_main(file, view, watch, timeit, draft, tex, latexmk, verbose, strict, pandoc_args):
-
-    if latexmk:
-        tex = True
-
-    if verbose:
-        print(f'[pandocmk] {verbose=}')
-
-    md_fn = Path(file)
-    assert md_fn.suffix == '.md'
-    assert md_fn.is_file()
-
-    # Get Pandoc options from CLI and YAML
-    # This also creates a temporary {filename}.yaml file with metadata based on styles
-    pandoc_options = get_pandoc_options(pandoc_args, md_fn, verbose=verbose, strict=strict)
-
-    # Always run early on
-    build_output(md_fn, view=view, timeit=timeit, tex=tex, latexmk=latexmk, verbose=verbose, pandoc_options=pandoc_options)
-
-    # Run on-demand if required
-    if watch:
-        monitor_file(md_fn, timeit=timeit, tex=tex, latexmk=latexmk, verbose=verbose, pandoc_options=pandoc_options)
-        #monitor_file(path, md_fn, timeit, verbose, pandoc_args)
 
 
 if __name__ == '__main__':

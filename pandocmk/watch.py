@@ -18,7 +18,7 @@ from .core import build_output
 
 class MarkdownUpdateHandler(FileSystemEventHandler):
 
-    def __init__(self, fn, timeit, tex, latexmk, verbose, pandoc_options):
+    def __init__(self, fn, view, timeit, tex, latexmk, verbose, pandoc_options):
         self.fn = fn
         self.fn = fn
         self.timeit = timeit
@@ -27,6 +27,11 @@ class MarkdownUpdateHandler(FileSystemEventHandler):
         self.verbose = verbose
         self.pandoc_options = pandoc_options
         self.last_update =  datetime.datetime(1,1,1) # Pick any old datetime
+
+        # Running first time
+        print('RUNNING FIRST TIME WITH EVENT HANDLER')
+        build_output(self.fn, view=view, timeit=self.timeit, tex=self.tex, latexmk=self.latexmk, verbose=self.verbose, pandoc_options=self.pandoc_options)
+
 
     def on_moved(self, event):
         return
@@ -71,19 +76,19 @@ class MarkdownUpdateHandler(FileSystemEventHandler):
 # Functions
 # ---------------------------
 
-def monitor_file(md_fn, timeit, tex, latexmk, verbose, pandoc_options):
+def monitor_file(md_fn, view, timeit, tex, latexmk, verbose, pandoc_options):
 
     path = '.'
     print(f'Monitoring file "{md_fn}" in directory {path}')
 
-    event_handler = MarkdownUpdateHandler(fn=md_fn, timeit=timeit, tex=tex, latexmk=latexmk, verbose=verbose, pandoc_options=pandoc_options)
+    event_handler = MarkdownUpdateHandler(fn=md_fn, view=view, timeit=timeit, tex=tex, latexmk=latexmk, verbose=verbose, pandoc_options=pandoc_options)
 
     observer = Observer(timeout=1)
     observer.schedule(event_handler, path, recursive=False)
     observer.start()
     try:
         while True:
-            time.sleep(0.1)
+            time.sleep(0.5)
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
