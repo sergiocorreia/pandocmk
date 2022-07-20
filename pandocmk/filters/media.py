@@ -338,12 +338,17 @@ def latexblock(code, file_found=True):
 # Main
 # ---------------------------
 
+
+def stop_if(e):
+        return isinstance(e, pf.Inline)
+
+
 def main(doc=None):
     tags = {'table': table_fenced_action,
             'figure': figure_fenced_action,
             'figures': figures_fenced_action,
             'stlog': stlog_fenced_action}
-    return pf.run_filter(action=pf.yaml_filter, prepare=prepare, finalize=finalize, tags=tags, doc=doc, walk_inlines=False) 
+    return pf.run_filter(action=pf.yaml_filter, prepare=prepare, finalize=finalize, tags=tags, doc=doc, stop_if=stop_if) 
 
 
 if __name__ == '__main__':
