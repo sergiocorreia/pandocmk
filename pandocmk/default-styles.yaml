@@ -142,3 +142,10 @@ proposal:
     filter:
       - pandoc-include # this has to be the first filter; https://github.com/DCsunset/pandoc-include
       - ../filters/media.py
+
+cv:
+  <<: *default
+  geometry: margin=2.5cm
+  pandoc:
+    template: cv-template.tex
+    #to: pdf

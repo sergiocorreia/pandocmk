@@ -41,7 +41,7 @@ pandocmk [FILES] [OPTIONS] [PANDOC OPTIONS]
 @click.option('--tex', is_flag=True, default=False, help="save .tex output besides .pdf")
 @click.option('--latexmk', is_flag=True, default=False, help="build pdf with latexmk; implies --tex")
 @click.option('--verbose', '-v', is_flag=True, default=False, help="show debugging information")
-@click.option('--strict', '-s', is_flag=True, default=True, help="stop with error if style not found")
+@click.option('--strict/--no-strict', '-s', is_flag=True, default=True, help="stop with error if style not found")
 @click.option('--retry', '-r', is_flag=True, default=False, help="try again in case of error (useful with --watch)")
 @click.argument('pandoc_args', nargs=-1, type=click.UNPROCESSED)
 
@@ -51,7 +51,7 @@ def main(file, view, watch, timeit, draft, tex, latexmk, verbose, strict, retry,
         tex = True
 
     if verbose:
-        print(f'[pandocmk] {verbose=}')
+        print(f'[pandocmk] {verbose=} {strict=} {latexmk=} {tex=} {retry=} {timeit=}')
 
     md_fn = Path(file)
     assert md_fn.suffix == '.md'
@@ -81,6 +81,10 @@ def print_backoff(args):
 
 
 def error_is_fatal(e):
+
+    print(e)
+    # BUGBUG FIXME
+    return False
     '''If there is a deeper error (such as a not-found filter) we will abort altogether'''
 
     # If there are no arguments (i.e. text message then we can't do anything)

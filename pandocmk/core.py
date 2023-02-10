@@ -123,7 +123,10 @@ def run_latexmk(fn, pdf_engine, verbose):
     (tmp_path / fn.name).unlink(missing_ok=True)
 
     # Run latexmk
-    panflute.shell(cmd)
+    try:
+        panflute.shell(cmd)
+    except IOError:
+        pass
 
     if verbose:
         toc = time.perf_counter()
