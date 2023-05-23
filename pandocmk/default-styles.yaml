@@ -11,7 +11,7 @@
 default: &default
   geometry: margin=2.5cm
   base-header-includes: &default-header-includes
-    - \newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}
+    #- \newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}
     - \usepackage{tabularx}
     - \usepackage{setspace}
 
@@ -73,7 +73,7 @@ slides:
   theme: metropolis
   media-in-back: False
   base-header-includes:
-    - '\newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}'
+    #- '\newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}'
 
 
 paper:
@@ -97,7 +97,7 @@ paper:
   base-header-includes:
     #- \newcommand{\sym}[1]{\rlap{$#1$}} # https://tex.stackexchange.com/questions/47418/siunitx-specifying-custom-command-as-input-symbol
     - \newcommand{\sym}[1]{{#1}} # https://tex.stackexchange.com/questions/47418/siunitx-specifying-custom-command-as-input-symbol
-    - '\newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}'
+    #- '\newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}'
     #
     - \usepackage[noabbrev]{cleveref} # must be loaded after hyperref
     - \usepackage[toc,page,title]{appendix} # https://ctan.math.utah.edu/ctan/tex-archive/macros/latex/contrib/appendix/appendix.pdf
@@ -131,7 +131,7 @@ proposal:
   hyperrefoptions: bookmarksnumbered
   base-header-includes:
     - \newcommand{\sym}[1]{{#1}} # https://tex.stackexchange.com/questions/47418/siunitx-specifying-custom-command-as-input-symbol
-    - '\newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}'
+    # - '\newcommand{\hideFromPandoc}[1]{#1}\hideFromPandoc{\let\Begin\begin\let\End\end}'
     - \usepackage[noabbrev]{cleveref} # must be loaded after hyperref
     - \usepackage[toc,page,title]{appendix} # https://ctan.math.utah.edu/ctan/tex-archive/macros/latex/contrib/appendix/appendix.pdf
   pandoc:
