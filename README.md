@@ -55,12 +55,14 @@ pip uninstall pandocmk
 
 ## Dev Install
 
+
 After cloning the repo and opening the pandocmk folder:
 
-`python setup.py install`: install the package locally
-
-`python setup.py develop`: install locally with a symlink so changes are automatically updated
-
+```
+sudo apt install pipx
+pipx ensurepath
+pipx install --editable ~/git/pandocmk
+```
 
 ## Dev Update PyPI:
 
